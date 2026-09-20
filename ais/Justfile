@@ -1,0 +1,6 @@
+# AIS-catcher vit dans ext/, avec les autres sources tierces.
+# La recette est là-bas ; celle-ci n'est qu'un raccourci depuis ais/.
+
+# compile AIS-catcher
+build:
+    @just -f ../ext/Justfile AIS-catcher

@@ -1,0 +1,42 @@
+# Compilation des sources tierces. Une cible par sous-module, la cible par
+# défaut les compile toutes.
+#
+#   just                    # les deux
+#   just redsea             # une seule
+#   just --list             # ce qui est disponible
+#
+# Les sous-modules doivent être là :
+#
+#   git submodule update --init --recursive
+
+# Les chemins sont ancrés sur ce fichier : les cibles marchent depuis n'importe
+# quel répertoire, y compris appelées par les Justfiles de fm/ et ais/.
+ext := justfile_directory()
+
+# Apple Silicon : brew installe liquid-dsp sous /opt/homebrew, que meson trouve
+# mais ne passe pas au compilateur. Pour les cibles cmake, rien à faire.
+brew := "/opt/homebrew"
+
+alias ais-catcher := AIS-catcher
+
+# compile les deux sous-modules
+default: redsea AIS-catcher
+
+# décodeur RDS, utilisé par fm/
+redsea:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd {{ext}}/redsea
+    export CPPFLAGS=-I{{brew}}/include CXXFLAGS=-I{{brew}}/include LDFLAGS=-L{{brew}}/lib
+    # meson refuse un setup sur un build/ déjà configuré : la cible doit rester
+    # rejouable sans avoir à effacer le répertoire à la main.
+    if [ -d build ]; then meson setup --reconfigure build; else meson setup build; fi
+    meson compile -C build
+
+# décodeur AIS, utilisé par ais/
+AIS-catcher:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd {{ext}}/AIS-catcher
+    cmake -B build -D CMAKE_BUILD_TYPE=Release -G Ninja
+    cmake --build build

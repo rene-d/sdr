@@ -1,0 +1,8 @@
+[submodule "ext/redsea"]
+	path = ext/redsea
+	url = https://github.com/windytan/redsea.git
+	branch = master
+[submodule "ext/AIS-catcher"]
+	path = ext/AIS-catcher
+	url = https://github.com/jvde-github/AIS-catcher.git
+	branch = main
